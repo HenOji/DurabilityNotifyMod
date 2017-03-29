@@ -1,0 +1,11 @@
+{
+    "notify01": {
+        "category": "master",
+        "sounds": [
+            {
+                "name": "example:notify01",
+                "stream": false
+            }
+        ]
+    }
+}

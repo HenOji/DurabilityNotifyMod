@@ -1,0 +1,22 @@
+
+key.durabilityNotify.toggle=Toggle Durability Notify
+key.displayEnchant=Display enchant key
+
+notifymod.config.title=Durability Notify Mod Configuration
+notifymod.config.help.1=*Notify is not enabled in creative mode and spectator mode.
+notifymod.config.help.2=Position to display enchant
+notifymod.config.help.3=Enchant display duration
+notifymod.config.option.notify.enabled=Enable display durability and sound notify.
+notifymod.config.option.notify.onlyEnchant.enabled=Enable notify sound only enchanted item.
+notifymod.config.option.displayEnchant.enabled=Enable display enchant when change hotbar.
+notifymod.config.option.displayEnchant.preset.0=Bottom left
+notifymod.config.option.displayEnchant.preset.1=Hotbar left
+notifymod.config.option.displayEnchant.preset.2=Hotbar right
+notifymod.config.option.displayEnchant.preset.3=Bottom right
+notifymod.config.option.displayEnchant.preset.4=Middle right
+notifymod.config.option.displayEnchant.preset.5= Top  right
+notifymod.config.option.displayEnchant.preset.6= Top  center
+notifymod.config.option.displayEnchant.preset.7= Top  left
+notifymod.config.option.displayEnchant.preset.8=Middle left
+notifymod.config.option.displayEnchant.sec=sec
+notifymod.config.option.displayEnchant.reset=Reset

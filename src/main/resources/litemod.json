@@ -1,0 +1,8 @@
+{
+    "name": "Durability Notify Mod",
+    "version": 1.0.0,
+    "mcversion": "1.11.r2",
+    "mixinConfigs": [
+        "mixins.example.json"
+    ]
+}
