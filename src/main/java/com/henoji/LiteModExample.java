@@ -42,21 +42,29 @@ public class LiteModExample implements Tickable, PreRenderListener, Configurable
 	private static KeyBinding durabilityNotifyKey = new KeyBinding("key.durabilityNotify.toggle", Keyboard.KEY_I, "key.categories.litemods");
 	private static KeyBinding displayEnchantKey   = new KeyBinding("key.displayEnchant", Keyboard.KEY_G, "key.categories.litemods");
 
-//	@Expose
-//	@SerializedName("clock_size")
-//	private int clockSize = 64;
-
-//	@Expose
-//	@SerializedName("clock_visible")
-//	private boolean clockVisible = true;
-
 	@Expose
 	@SerializedName("durability_notify")
 	private boolean isNotify = true;
 
 	@Expose
-	@SerializedName("durability_notify_onlyEnchant")
-	private boolean isNotifyOnlyEnchant = false;
+	@SerializedName("durability_notify_sound_Mainhand")
+	private boolean isNotifySoundMainhand = true;
+
+	@Expose
+	@SerializedName("durability_notify_sound_Offhand")
+	private boolean isNotifySoundOffhand = true;
+
+	@Expose
+	@SerializedName("durability_notify_sound_onlyEnchant")
+	private boolean isNotifySoundOnlyEnchant = false;
+
+	@Expose
+	@SerializedName("durability_notify_durability_Mainhand")
+	private boolean isDisplayDurabilityMainhand = true;
+
+	@Expose
+	@SerializedName("durability_notify_durability_Offhand")
+	private boolean isDisplayDurabilityOffhand = true;
 
 	@Expose
 	@SerializedName("durability_notify_displayEnchant")
@@ -119,14 +127,15 @@ public class LiteModExample implements Tickable, PreRenderListener, Configurable
 	{
 		// The key binding declared above won't do anything unless we register it, ModUtilties provides
 		// a convenience method for this
-//		LiteLoader.getInput().registerKeyBinding(LiteModExample.clockKeyBinding);
-//		this.clock.setSize(this.clockSize);
-//		this.clock.setVisible(this.clockVisible);
 
 		LiteLoader.getInput().registerKeyBinding(LiteModExample.durabilityNotifyKey);
 		LiteLoader.getInput().registerKeyBinding(LiteModExample.displayEnchantKey);
 
-		this.dNotify.setNotifyOnlyEnchant(this.isNotifyOnlyEnchant);
+		this.dNotify.setNotifySoundHand(this.isNotifySoundMainhand, 0);
+		this.dNotify.setNotifySoundHand(this.isNotifySoundOffhand, 1);
+		this.dNotify.setNotifySoundOnlyEnchant(this.isNotifySoundOnlyEnchant);
+		this.dNotify.setDisplayDurabilityHand(this.isDisplayDurabilityMainhand, 0);
+		this.dNotify.setDisplayDurabilityHand(this.isDisplayDurabilityOffhand, 1);
 		this.dNotify.setDisplayEnchant(this.isDisplayEnchant);
 		this.dNotify.setDisplayEnchantPreset(this.displayEnchantPreset);
 		this.dNotify.setEnchantDisplaySecs(this.enchantDisplaySecs);
@@ -217,15 +226,59 @@ public class LiteModExample implements Tickable, PreRenderListener, Configurable
 		this.isNotify = toggle;
 	}
 
-	/* 通知機能エンチャントOnly ON/OFF */
-	boolean isDurabilityNotifyOnlyEnchant()
+	/* 通知音 メインハンド ON/OFF */
+	boolean isNotifySoundMainhand()
 	{
-		return this.dNotify.isNotifyOnlyEnchant();
+		return this.dNotify.isNotifySoundHand(0);
 	}
 
-	void setDurabilityNotifyOnlyEnchant(boolean toggle)
+	void setNotifySoundMainhand(boolean toggle)
 	{
-		this.dNotify.setNotifyOnlyEnchant(this.isNotifyOnlyEnchant = toggle);
+		this.dNotify.setNotifySoundHand(this.isNotifySoundMainhand = toggle, 0);
+	}
+
+	/* 通知音 オフハンド ON/OFF */
+	boolean isNotifySoundOffhand()
+	{
+		return this.dNotify.isNotifySoundHand(1);
+	}
+
+	void setNotifySoundOffhand(boolean toggle)
+	{
+		this.dNotify.setNotifySoundHand(this.isNotifySoundOffhand = toggle, 1);
+	}
+
+	/* 通知音エンチャントのみ ON/OFF */
+	boolean isNotifySoundOnlyEnchant()
+	{
+		return this.dNotify.isNotifySoundOnlyEnchant();
+	}
+
+	/* 耐久値表示 メインハンド ON/OFF */
+	boolean isDisplayDurabilityMainhand()
+	{
+		return this.dNotify.isDisplayDurabilityHand(0);
+	}
+
+	void setDisplayDurabilityMainhand(boolean toggle)
+	{
+		this.dNotify.setDisplayDurabilityHand(this.isDisplayDurabilityMainhand = toggle, 0);
+	}
+
+	/* 耐久値表示 オフハンド ON/OFF */
+	boolean isDisplayDurabilityOffhand()
+	{
+		return this.dNotify.isDisplayDurabilityHand(1);
+	}
+
+	void setDisplayDurabilityOffhand(boolean toggle)
+	{
+		this.dNotify.setDisplayDurabilityHand(this.isDisplayDurabilityOffhand = toggle, 1);
+	}
+
+	void setNotifySoundOnlyEnchant(boolean toggle)
+	{
+		this.dNotify.setNotifySoundOnlyEnchant(this.isNotifySoundOnlyEnchant = toggle);
 	}
 
 	/* 通知機能 ON/OFF キー名 getter */

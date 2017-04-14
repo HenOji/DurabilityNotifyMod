@@ -39,12 +39,20 @@ public class ExampleModConfigPanel extends AbstractConfigPanel
     protected void addOptions(ConfigPanelHost host)
     {
         final LiteModExample mod = host.<LiteModExample>getMod();
+        int y = 0;
 
-        /* 説明文 */
-        this.addLabel(0, 0, 0, 200, 16, 0xf0f060, I18n.format("notifymod.config.help.1"));
+        /* 注意文 */
+        this.addLabel(1, 0, y, 200, 16, 0xf0f060, I18n.format("notifymod.config.help.1"));
 
-        /* 耐久通知チェックボックス */
-        this.addControl(new GuiCheckbox(0, 0, 16, I18n.format("notifymod.config.option.notify.enabled") +" ('"+ mod.getDurabilityNotifyKeyName() +"' Key)"),
+        y += 16;
+
+        /* General */
+        this.addLabel(2, 0, y, 200, 16, 0x99ccff, I18n.format("notifymod.config.help.2"));
+
+        y += 16;
+
+        /* Mod ON/OFF */
+        this.addControl(new GuiCheckbox(0, 16, y, I18n.format("notifymod.config.option.notify.enabled") +" ('"+ mod.getDurabilityNotifyKeyName() +"' Key)"),
         		new ConfigOptionListener<GuiCheckbox>()
         		{
         			@Override
@@ -55,20 +63,91 @@ public class ExampleModConfigPanel extends AbstractConfigPanel
         			}
         		}).checked = mod.isDurabilityNotify();
 
-        /* エンチャントアイテムのみチェックボックス */
-        this.addControl(new GuiCheckbox(1, 16, 32, I18n.format("notifymod.config.option.notify.onlyEnchant.enabled")),
+        y += 20;
+
+        /* Notify Sound */
+        this.addLabel(3, 0, y, 200, 16, 0x99ccff, I18n.format("notifymod.config.help.3"));
+
+        y += 16;
+
+        /* Main Hand */
+        this.addControl(new GuiCheckbox(1, 16, y, I18n.format("notifymod.config.option.mainhand")),
         		new ConfigOptionListener<GuiCheckbox>()
         		{
             		@Override
             		public void actionPerformed(GuiCheckbox control)
             		{
-            			mod.setDurabilityNotifyOnlyEnchant(control.checked = !control.checked);
+            			mod.setNotifySoundMainhand(control.checked = !control.checked);
             			LiteLoader.getInstance().writeConfig(mod);
             		}
-        		}).checked = mod.isDurabilityNotifyOnlyEnchant();
+        		}).checked = mod.isNotifySoundMainhand();
 
-        /* ツールのエンチャントを表示する */
-        this.addControl(new GuiCheckbox(2, 16, 48, I18n.format("notifymod.config.option.displayEnchant.enabled") +" ('"+ mod.getDisplayEnchantKeyName() +"' Key)"),
+        /* Off Hand */
+        this.addControl(new GuiCheckbox(2, 128, y, I18n.format("notifymod.config.option.offhand")),
+        		new ConfigOptionListener<GuiCheckbox>()
+        		{
+            		@Override
+            		public void actionPerformed(GuiCheckbox control)
+            		{
+            			mod.setNotifySoundOffhand(control.checked = !control.checked);
+            			LiteLoader.getInstance().writeConfig(mod);
+            		}
+        		}).checked = mod.isNotifySoundOffhand();
+
+        y += 16;
+
+        /* エンチャントアイテムのみ通知音鳴らすチェックボックス */
+        this.addControl(new GuiCheckbox(3, 16, y, I18n.format("notifymod.config.option.notify.onlyEnchant.enabled")),
+        		new ConfigOptionListener<GuiCheckbox>()
+        		{
+            		@Override
+            		public void actionPerformed(GuiCheckbox control)
+            		{
+            			mod.setNotifySoundOnlyEnchant(control.checked = !control.checked);
+            			LiteLoader.getInstance().writeConfig(mod);
+            		}
+        		}).checked = mod.isNotifySoundOnlyEnchant();
+
+        y += 20;
+
+        /* Display Durability */
+        this.addLabel(4, 0, y, 200, 16, 0x99ccff, I18n.format("notifymod.config.help.4"));
+
+        y += 16;
+
+        /* Main Hand */
+        this.addControl(new GuiCheckbox(4, 16, y, I18n.format("notifymod.config.option.mainhand")),
+        		new ConfigOptionListener<GuiCheckbox>()
+        		{
+            		@Override
+            		public void actionPerformed(GuiCheckbox control)
+            		{
+            			mod.setDisplayDurabilityMainhand(control.checked = !control.checked);
+            			LiteLoader.getInstance().writeConfig(mod);
+            		}
+        		}).checked = mod.isDisplayDurabilityMainhand();
+
+        /* Off Hand */
+        this.addControl(new GuiCheckbox(5, 128, y, I18n.format("notifymod.config.option.offhand")),
+        		new ConfigOptionListener<GuiCheckbox>()
+        		{
+            		@Override
+            		public void actionPerformed(GuiCheckbox control)
+            		{
+            			mod.setDisplayDurabilityOffhand(control.checked = !control.checked);
+            			LiteLoader.getInstance().writeConfig(mod);
+            		}
+        		}).checked = mod.isDisplayDurabilityOffhand();
+
+        y += 20;
+
+        /* Display Enchant */
+        this.addLabel(5, 0, y, 200, 16, 0x99ccff, I18n.format("notifymod.config.help.5"));
+
+        y += 16;
+
+        /* アイテムが変わったらエンチャントを表示するチェックボックス */
+        this.addControl(new GuiCheckbox(6, 16, y, I18n.format("notifymod.config.option.displayEnchant.enabled") +" ('"+ mod.getDisplayEnchantKeyName() +"' Key)"),
         		new ConfigOptionListener<GuiCheckbox>()
         		{
             		@Override
@@ -79,8 +158,12 @@ public class ExampleModConfigPanel extends AbstractConfigPanel
             		}
         		}).checked = mod.isDisplayEnchant();
 
-        /* 説明文2 */
-        this.addLabel(3, 32, 64, 200, 16, 0xe0e0e0, I18n.format("notifymod.config.help.2") +" ('Ctrl+"+ mod.getDisplayEnchantKeyName() +"' Key)");
+        y += 16;
+
+        /* 表示位置 */
+        this.addLabel(6, 32, y, 200, 16, 0xe0e0e0, I18n.format("notifymod.config.help.6") +" ('Ctrl+"+ mod.getDisplayEnchantKeyName() +"' Key)");
+
+        y += 14;
 
         /* エンチャント名表示位置プリセット スライドバー */
         this.addControl(new GuiSlider(new GuiPageButtonList.GuiResponder()
@@ -96,7 +179,7 @@ public class ExampleModConfigPanel extends AbstractConfigPanel
 			@Override
 			public void setEntryValue(int id, boolean value) {}
 
-		}, 4, 32, 78, "", 0, 8.9F, mod.getDisplayEnchantPreset(),
+		}, 4, 32, y, "", 0, 8.9F, mod.getDisplayEnchantPreset(),
 
     		new GuiSlider.FormatHelper()
     		{
@@ -112,8 +195,12 @@ public class ExampleModConfigPanel extends AbstractConfigPanel
 					public void actionPerformed(GuiSlider control){}
 				});
 
-        /* 説明文3 */
-        this.addLabel(5, 32, 102, 200, 16, 0xe0e0e0, I18n.format("notifymod.config.help.3"));
+        y += 24;
+
+        /* 表示時間 */
+        this.addLabel(7, 32, y, 200, 16, 0xe0e0e0, I18n.format("notifymod.config.help.7"));
+
+        y += 14;
 
         final GuiSlider displaySecSlider;
 
@@ -131,7 +218,7 @@ public class ExampleModConfigPanel extends AbstractConfigPanel
 			@Override
 			public void setEntryValue(int id, boolean value) {}
 
-		}, 6, 32, 116, "", 1.0F, 10.0F, mod.getEnchantDisplaySecs(),
+		}, 6, 32, y, "", 1.0F, 10.0F, mod.getEnchantDisplaySecs(),
 
     		new GuiSlider.FormatHelper()
     		{
@@ -147,8 +234,10 @@ public class ExampleModConfigPanel extends AbstractConfigPanel
 					public void actionPerformed(GuiSlider control){}
 				});
 
+        y += 6;
+
         /* エンチャント名表示時間をリセット(2.0秒に)する */
-        this.addControl(new GuiHoverLabel(7, 184, 122, mc.fontRendererObj, I18n.format("notifymod.config.option.displayEnchant.reset")),
+        this.addControl(new GuiHoverLabel(7, 184, y, mc.fontRendererObj, I18n.format("notifymod.config.option.reset")),
         		new ConfigOptionListener<GuiHoverLabel>()
         		{
             		@Override
@@ -159,6 +248,8 @@ public class ExampleModConfigPanel extends AbstractConfigPanel
             			LiteLoader.getInstance().writeConfig(mod);
             		}
         		});
+
+        y += 24 - 6;
     }
 
     @Override

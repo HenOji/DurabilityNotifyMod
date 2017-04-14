@@ -15,16 +15,19 @@ public class DurabilityNotify
 	private Minecraft mc;
 	private Render    render;
 
-	private boolean isNotifyOnlyEnchant,
+	private boolean isNotifySoundOnlyEnchant,
 					isDisplayEnchant,
 					isItemChanged,
 					isPresetChanged;
 
-	private float   enchantDisplaySecs,
-					displayTicks,
-					partialTicks;
+	private boolean[] isNotifySoundArray = {false,false},
+					  isDisplayDurabilityArray = {false,false};
 
-	private int     displayEnchantPreset;
+	private float enchantDisplaySecs,
+				  displayTicks,
+				  partialTicks;
+
+	private int   displayEnchantPreset;
 
 	private final int[] NOTIFY_ARRAY = {50, 25, 10, 3, 2, 1, 0, -1}; // 通知耐久値 降順
 
@@ -38,14 +41,34 @@ public class DurabilityNotify
 		this.render = new Render(mc);
 	}
 
-	/* 設定のエンチャントのみに適用するか */
-	public boolean isNotifyOnlyEnchant()
+	/* 設定の通知音を鳴らすか */
+	public boolean isNotifySoundHand(int Key)
 	{
-		return this.isNotifyOnlyEnchant;
+		return this.isNotifySoundArray[Key];
 	}
-	public void setNotifyOnlyEnchant(boolean toggle)
+	public void setNotifySoundHand(boolean toggle, int Key)
 	{
-		this.isNotifyOnlyEnchant = toggle;
+		this.isNotifySoundArray[Key] = toggle;
+	}
+
+	/* 設定のエンチャントのみに適用するか */
+	public boolean isNotifySoundOnlyEnchant()
+	{
+		return this.isNotifySoundOnlyEnchant;
+	}
+	public void setNotifySoundOnlyEnchant(boolean toggle)
+	{
+		this.isNotifySoundOnlyEnchant = toggle;
+	}
+
+	/* 設定の耐久値を表示するか */
+	public boolean isDisplayDurabilityHand(int Key)
+	{
+		return this.isDisplayDurabilityArray[Key];
+	}
+	public void setDisplayDurabilityHand(boolean toggle, int Key)
+	{
+		this.isDisplayDurabilityArray[Key] = toggle;
 	}
 
 	/* 設定のエンチャントの表示 */
@@ -89,6 +112,7 @@ public class DurabilityNotify
 	public void startNotify(Minecraft mc, float partialTicks)
 	{
 		this.mc = mc;
+
 		ItemStack mainhandItem = mc.player.inventory.getCurrentItem();
 		int currentHotbar      = mc.player.inventory.currentItem;
 		ItemStack offhandItem  = mc.player.inventory.offHandInventory.get(0);
@@ -126,7 +150,7 @@ public class DurabilityNotify
 						// アイテムの耐久値が通知する値より大きい
 						if(itemDurability > NOTIFY_ARRAY[notifyKeyArray[handKey]]) break;
 					}
-					notifySound(handItem, notifyKeyArray[handKey]); // 通知音
+					if(isNotifySoundArray[handKey]) notifySound(handItem, notifyKeyArray[handKey]); // 通知音
 				}
 			}
 			else // ホットバーとアイテムが前Tickと同じ
@@ -134,24 +158,11 @@ public class DurabilityNotify
 				if(itemDurability <= NOTIFY_ARRAY[notifyKeyArray[handKey]]) // 耐久値が通知耐久値以下
 				{
 					notifyKeyArray[handKey]++;
-					notifySound(handItem, notifyKeyArray[handKey]); // 通知音
+					if(isNotifySoundArray[handKey]) notifySound(handItem, notifyKeyArray[handKey]); // 通知音
 				}
 			}
 			/* 耐久値表示 */
-			int fontColor;
-			if(notifyKeyArray[handKey] > 2) // 耐久値 色
-			{
-				fontColor = 0xffff4040; // 赤色
-			}
-			else if(notifyKeyArray[handKey] > 0)
-			{
-				fontColor = 0xffffff20; // 黄色
-			}
-			else
-			{
-				fontColor = 0xff80ff20; // 緑色
-			}
-			render.renderSelectedString(Integer.toString(itemDurability), fontColor, handKey);
+			if(isDisplayDurabilityArray[handKey]) displayDurability(handKey, itemDurability);
 		}
 		/* 配列に代入 */
 		prevItemArray[handKey]   = handItem;
@@ -161,7 +172,7 @@ public class DurabilityNotify
 	/* 通知音メソッド */
 	private void notifySound(ItemStack currentItem, int notifyKey)
 	{
-		if(!isNotifyOnlyEnchant            // 1: "エンチャントのみ通知" にチェックが付いているか
+		if(!isNotifySoundOnlyEnchant       // 1: "エンチャントのみ通知" にチェックが付いているか
 		||  currentItem.isItemEnchanted()) // 2: アイテムにエンチャントが付いているか
 		{
 			float pitch = ( 0.85F + notifyKey * 0.15F );
@@ -171,6 +182,25 @@ public class DurabilityNotify
 					mc.player.posY,
 					mc.player.posZ));
 		}
+	}
+
+	/* 耐久表示メソッド */
+	private void displayDurability(int handKey, int itemDurability)
+	{
+		int fontColor;
+		if(notifyKeyArray[handKey] > 2) // 耐久値 色
+		{
+			fontColor = 0xffff4040; // 赤色
+		}
+		else if(notifyKeyArray[handKey] > 0)
+		{
+			fontColor = 0xffffff20; // 黄色
+		}
+		else
+		{
+			fontColor = 0xff80ff20; // 緑色
+		}
+		render.renderSelectedString(Integer.toString(itemDurability), fontColor, handKey);
 	}
 
 	/* エンチャント表示メソッド */
