@@ -59,3 +59,4 @@ litemod {
 jar {
     from litemod.outputs
 }
+[compileJava, compileTestJava].each{ it.options.encoding = 'UTF-8' }

@@ -170,15 +170,14 @@ public class LiteModExample implements Tickable, PreRenderListener, Configurable
 //			this.clock.render(minecraft);
 
 		// ゲームプレイ画面
-		if(minecraft.currentScreen == null && Minecraft.isGuiEnabled() && inGame)
+		if(minecraft.currentScreen == null && Minecraft.isGuiEnabled() && inGame && minecraft.playerController.gameIsSurvivalOrAdventure())
 		{
-			new DurabilityNotify(minecraft);
 			if (LiteModExample.durabilityNotifyKey.isPressed())
 			{
 				setDurabilityNotify(!isNotify);
 				LiteLoader.getInstance().writeConfig(this);
 			}
-			if(LiteModExample.displayEnchantKey.isPressed() && isNotify)
+			if(LiteModExample.displayEnchantKey.isPressed() && isNotify && minecraft.player.inventory.getCurrentItem().isItemEnchanted())
 			{
 				if(Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
 				{
@@ -186,12 +185,12 @@ public class LiteModExample implements Tickable, PreRenderListener, Configurable
 					setDisplayEnchantPreset((this.displayEnchantPreset + 1) % 9); // エンチャント表示位置
 					LiteLoader.getInstance().writeConfig(this);
 				}
-				dNotify.setDisplayTicks(partialTicks);
+				dNotify.setDisplayTicks();
 			}
 			// 通知スタート
-			if (minecraft.playerController.gameIsSurvivalOrAdventure() && isNotify)
+			if (isNotify)
 			{
-				dNotify.startNotify(partialTicks);
+				dNotify.startNotify(minecraft, partialTicks);
 			}
 		}
 	}

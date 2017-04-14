@@ -12,44 +12,30 @@ import net.minecraft.item.ItemStack;
 
 public class DurabilityNotify
 {
-	private ItemStack    prevItem = ItemStack.EMPTY;
-	private Minecraft    mc;
-	private Render       render;
+	private Minecraft mc;
+	private Render    render;
 
 	private boolean isNotifyOnlyEnchant,
 					isDisplayEnchant,
-					isChanged;
+					isItemChanged,
+					isPresetChanged;
 
 	private float   enchantDisplaySecs,
 					displayTicks,
 					partialTicks;
 
-	private int     displayEnchantPreset,
-					prevHotbar = -1,
-					notifyArrayKey;
+	private int     displayEnchantPreset;
 
 	private final int[] NOTIFY_ARRAY = {50, 25, 10, 3, 2, 1, 0, -1}; // 通知耐久値 降順
+
+	private ItemStack[] prevItemArray   = {ItemStack.EMPTY, ItemStack.EMPTY};
+	private int[]       prevHotbarArray = {-1, -1};
+	private int[]       notifyKeyArray  = {0, 0};
 
 	/* Constructor */
 	public DurabilityNotify(Minecraft mc)
 	{
-		this.mc = mc;
 		this.render = new Render(mc);
-	}
-
-	public int getCurrentHotbar()
-	{
-		return mc.player.inventory.currentItem;
-	}
-
-	public ItemStack getCurrentItem()
-	{
-		return mc.player.inventory.getCurrentItem();
-	}
-
-	public int getItemDurability()
-	{
-		return (getCurrentItem().getMaxDamage()) - (getCurrentItem().getItemDamage());
 	}
 
 	/* 設定のエンチャントのみに適用するか */
@@ -70,7 +56,6 @@ public class DurabilityNotify
 	public void setDisplayEnchant(boolean toggle)
 	{
 		this.isDisplayEnchant = toggle;
-		if(!toggle) displayTicks = 0;
 	}
 
 	/* 設定のエンチャント表示位置プリセット */
@@ -81,7 +66,7 @@ public class DurabilityNotify
 	public void setDisplayEnchantPreset(int preset)
 	{
 		this.displayEnchantPreset = preset;
-		this.isChanged = true;
+		this.isPresetChanged = true;
 	}
 
 	/* 設定のエンチャント表示時間 */
@@ -95,61 +80,70 @@ public class DurabilityNotify
 	}
 
 	/* setエンチャント表示時間 */
-	public void setDisplayTicks(float partialTicks)
+	public void setDisplayTicks()
 	{
-		if(getCurrentItem().isItemEnchanted())
+		this.displayTicks = this.enchantDisplaySecs * 20.0F;
+	}
+
+	/* ここから始まる */
+	public void startNotify(Minecraft mc, float partialTicks)
+	{
+		this.mc = mc;
+		ItemStack mainhandItem = mc.player.inventory.getCurrentItem();
+		int currentHotbar      = mc.player.inventory.currentItem;
+		ItemStack offhandItem  = mc.player.inventory.offHandInventory.get(0);
+
+		/* 耐久通知検索 */
+		searchNotify(mainhandItem, currentHotbar, 0);
+		searchNotify(offhandItem, -1, 1);
+
+		// エンチャント表示
+		if(isItemChanged && isDisplayEnchant && mainhandItem.isItemEnchanted()) setDisplayTicks();
+		if(!mainhandItem.isItemEnchanted()) displayTicks = 0;
+		if((int)displayTicks > 0)
 		{
-			this.displayTicks = this.enchantDisplaySecs * 20.0F;
-			this.partialTicks = partialTicks;
-		}
-		else
-		{
-			this.displayTicks = 0;
+			displayEnchant(partialTicks, mainhandItem);
 		}
 	}
 
-	public void startNotify(float partialTicks)
+	/* 耐久通知検索メソッド */
+	private void searchNotify(ItemStack handItem, int currentHotbar, int handKey)
 	{
 		/* 1 AND (2 OR 3) AND 4 */
-		if(getCurrentItem().isItemStackDamageable())             // 1: ツールか
+		if(handItem.isItemStackDamageable()) // 1: ツールか
 		{
-			if(prevHotbar != getCurrentHotbar()                  // 2: 前Tickとホットバーが違うか
-			|| prevItem.getItem() != getCurrentItem().getItem()) // 3: 前Tickとアイテムが違うか
+			int itemDurability = handItem.getMaxDamage() - handItem.getItemDamage();
+
+			if(prevHotbarArray[handKey] != currentHotbar               // 2: 前Tickとホットバーが違うか
+			|| prevItemArray[handKey].getItem() != handItem.getItem()) // 3: 前Tickとアイテムが違うか
 			{
-				notifyArrayKey = 0;
-				if(getItemDurability() <= NOTIFY_ARRAY[notifyArrayKey]) // 4: 通知耐久最大値以下か
+				notifyKeyArray[handKey] = 0;
+				if(handKey == 0) isItemChanged = true; // アイテムが変わった
+				if(itemDurability <= NOTIFY_ARRAY[0]) // 4: 通知耐久最大値以下か
 				{
-					for (notifyArrayKey = 1; notifyArrayKey < NOTIFY_ARRAY.length; notifyArrayKey++)
+					for (notifyKeyArray[handKey] = 1; notifyKeyArray[handKey] < NOTIFY_ARRAY.length; notifyKeyArray[handKey]++)
 					{
 						// アイテムの耐久値が通知する値より大きい
-						if(getItemDurability() > NOTIFY_ARRAY[notifyArrayKey]) break;
+						if(itemDurability > NOTIFY_ARRAY[notifyKeyArray[handKey]]) break;
 					}
-					notifySound(); // 通知音
+					notifySound(handItem, notifyKeyArray[handKey]); // 通知音
 				}
-				if(isDisplayEnchant)setDisplayTicks(partialTicks);
-				isChanged = true;
 			}
-			else // ホットバーとアイテムが同じ
+			else // ホットバーとアイテムが前Tickと同じ
 			{
-				if(getItemDurability() <= NOTIFY_ARRAY[notifyArrayKey]) // 耐久値が通知耐久値以下
+				if(itemDurability <= NOTIFY_ARRAY[notifyKeyArray[handKey]]) // 耐久値が通知耐久値以下
 				{
-					notifySound(); // 通知音
-					notifyArrayKey++;
+					notifyKeyArray[handKey]++;
+					notifySound(handItem, notifyKeyArray[handKey]); // 通知音
 				}
 			}
-			// エンチャント表示
-			if((int)displayTicks > 0)
-			{
-				displayEnchant(partialTicks);
-			}
-
 			/* 耐久値表示 */
 			int fontColor;
-			if(notifyArrayKey > 2) // 耐久値 色
+			if(notifyKeyArray[handKey] > 2) // 耐久値 色
 			{
 				fontColor = 0xffff4040; // 赤色
 			}
-			else if(notifyArrayKey > 0)
+			else if(notifyKeyArray[handKey] > 0)
 			{
 				fontColor = 0xffffff20; // 黄色
 			}
@@ -157,24 +151,20 @@ public class DurabilityNotify
 			{
 				fontColor = 0xff80ff20; // 緑色
 			}
-			render.renderSelectedString(Integer.toString(getItemDurability()), fontColor);
+			render.renderSelectedString(Integer.toString(itemDurability), fontColor, handKey);
 		}
-		else // 持っているアイテムがツール以外
-		{
-			displayTicks = 0;
-		}
-		/* 変数に代入 */
-		prevItem   = getCurrentItem();
-		prevHotbar = getCurrentHotbar();
+		/* 配列に代入 */
+		prevItemArray[handKey]   = handItem;
+		prevHotbarArray[handKey] = currentHotbar;
 	}
 
 	/* 通知音メソッド */
-	private void notifySound()
+	private void notifySound(ItemStack currentItem, int notifyKey)
 	{
-		if(!isNotifyOnlyEnchant                 // 1: "エンチャントのみ通知" にチェックが付いているか
-		||  getCurrentItem().isItemEnchanted()) // 2: アイテムにエンチャントが付いているか
+		if(!isNotifyOnlyEnchant            // 1: "エンチャントのみ通知" にチェックが付いているか
+		||  currentItem.isItemEnchanted()) // 2: アイテムにエンチャントが付いているか
 		{
-			float pitch = ( 0.85F + notifyArrayKey * 0.15F );
+			float pitch = ( 0.85F + notifyKey * 0.15F );
 			mc.getSoundHandler().playSound(SetSound.setNotifySound(
 					pitch,
 					mc.player.posX,
@@ -184,12 +174,13 @@ public class DurabilityNotify
 	}
 
 	/* エンチャント表示メソッド */
-	private void displayEnchant(float partialTicks)
+	private void displayEnchant(float partialTicks, ItemStack currentItem)
 	{
-		if(isChanged) // 手持ちアイテム 又は 表示位置が変わっていたらエンチャントリストを更新する
+		if(isItemChanged || isPresetChanged)
 		{
-			render.setDisplayEnchant(getCurrentItem(), displayEnchantPreset);
-			if(!(displayEnchantPreset == 1 || displayEnchantPreset == 2)) isChanged = false;
+			render.setDisplayEnchant(currentItem, displayEnchantPreset, isItemChanged);
+			isItemChanged = false;
+			if(!(displayEnchantPreset == 1 || displayEnchantPreset == 2)) isPresetChanged = false;
 		}
 
 		int alpha = (int)(this.displayTicks * 256.0F / 10.0F);

@@ -62,11 +62,27 @@ public class Render{
 	}
 
 	/* 耐久値描画 */
-	public void renderSelectedString(String text, int color)
+	public void renderSelectedString(String text, int color, int handKey)
 	{
 		setScaledResolution();
-		int posX = (dispW - fontRenderer.getStringWidth(text)) / 2;
-		int posY = dispH - 48;
+		int posX = 0, posY = 0, fontW = fontRenderer.getStringWidth(text);
+		if(handKey == 0) // メインハンド
+		{
+			posX = (dispW - fontW) / 2;
+			posY = dispH - 48;
+		}
+		else // オフハンド
+		{
+			if(mc.gameSettings.mainHand == EnumHandSide.RIGHT) // メインハンドが右
+			{
+				posX = dispW / 2 -97 -12 - fontW / 2;
+			}
+			else // メインハンドが左
+			{
+				posX = dispW / 2 +97 +12 - fontW / 2;
+			}
+			posY = dispH - 32;
+		}
 
 		glPushMatrix();
 		glEnableBlend();
@@ -80,22 +96,26 @@ public class Render{
 		glPopMatrix();
 	}
 
-	/* エンチャントリスト・表示位置 X,Y セット */
-	public void setDisplayEnchant(ItemStack currentItem, int displayEnchantPreset)
+	/* エンチャントリスト・表示位置 X, Yセット */
+	public void setDisplayEnchant(ItemStack currentItem, int displayEnchantPreset, boolean isChanged)
 	{
-		/* 初期化 */
-		int i = 0;
-		this.enchantList.clear();
-		this.fontW = 0;
-
-		for(Map.Entry<Enchantment, Integer> entry : EnchantmentHelper.getEnchantments(currentItem).entrySet())
+		if(isChanged)
 		{
-			this.enchantList.add(entry.getKey().getTranslatedName(entry.getValue()));
-			this.fontW = Integer.max(fontW, fontRenderer.getStringWidth(enchantList.get(i)));
-			i++;
-		}
-		this.fontH = fontRenderer.FONT_HEIGHT *i;
+			/* エンチャントリスト初期化・セット */
+			int i = 0;
+			this.enchantList.clear();
+			this.fontW = 0;
 
+			for(Map.Entry<Enchantment, Integer> entry : EnchantmentHelper.getEnchantments(currentItem).entrySet())
+			{
+				this.enchantList.add(entry.getKey().getTranslatedName(entry.getValue()));
+				this.fontW = Integer.max(fontW, fontRenderer.getStringWidth(enchantList.get(i)));
+				i++;
+			}
+			this.fontH = fontRenderer.FONT_HEIGHT *i;
+		}
+
+		/* 表示位置 X, Yセット */
 		setScaledResolution();
 		switch (displayEnchantPreset)
 		{
@@ -163,9 +183,9 @@ public class Render{
 		glPushMatrix();
 		glEnableBlend();
 		glBlendFuncSeparate(770, 771, 1, 0);
-		for(int j = 0; j < enchantList.size(); j++)
+		for(int i = 0; i < enchantList.size(); i++)
 		{
-			fontRenderer.drawStringWithShadow(enchantList.get(j), this.enchantX, this.enchantY +j *fontRenderer.FONT_HEIGHT, 0x00ffffff + (alpha << 24));
+			fontRenderer.drawStringWithShadow(enchantList.get(i), this.enchantX, this.enchantY +i *fontRenderer.FONT_HEIGHT, 0x00ffffff + (alpha << 24));
 		}
 		glDisableBlend();
 		glPopMatrix();
