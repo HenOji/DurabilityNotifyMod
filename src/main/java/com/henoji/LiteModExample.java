@@ -152,41 +152,27 @@ public class LiteModExample implements Tickable, PreRenderListener, Configurable
 	}
 
 	@Override
-	public void onTick(Minecraft minecraft, float partialTicks, boolean inGame, boolean clock)
+	public void onTick(Minecraft mc, float partialTicks, boolean inGame, boolean clock)
 	{
 		// The three checks here are critical to ensure that we only draw the clock as part of the "HUD"
 		// and don't draw it over active GUI's or other elements
-
-//			if (LiteModExample.clockKeyBinding.isPressed())
-//			{
-//				if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))
-//				{
-//					this.clockSize = (this.clockSize << 1) & 0x1FF;
-//					this.clock.setSize(this.clockSize);
-//					this.clockSize = this.clock.getSize();
-//				}
-//				else
-//				{
-//					this.clock.setVisible(!this.clock.isVisible());
-//					this.clockVisible = this.clock.isVisible();
-//				}
-
-				// Our @Expose annotations control what properties get saved, this tells liteloader to
-				// actually write the properties to disk
-				// LiteLoader.getInstance().writeConfig(this);
-//			}
-			// Render the clock
-//			this.clock.render(minecraft);
-
-		// ゲームプレイ画面
-		if(minecraft.currentScreen == null && Minecraft.isGuiEnabled() && inGame && minecraft.playerController.gameIsSurvivalOrAdventure())
+		// ゲームプレイ画面のみ作動
+		if(mc.currentScreen == null && Minecraft.isGuiEnabled() && inGame && mc.playerController.gameIsSurvivalOrAdventure())
 		{
 			if (LiteModExample.durabilityNotifyKey.isPressed())
 			{
 				setDurabilityNotify(!isNotify);
+				if(isNotify)
+				{
+					mc.getSoundHandler().playSound(SetSound.setNotifySound(2.0F));
+				}
+				else
+				{
+					mc.getSoundHandler().playSound(SetSound.setNotifySound(0.6F));
+				}
 				LiteLoader.getInstance().writeConfig(this);
 			}
-			if(LiteModExample.displayEnchantKey.isPressed() && isNotify && minecraft.player.inventory.getCurrentItem().isItemEnchanted())
+			if(LiteModExample.displayEnchantKey.isPressed() && isNotify && mc.player.inventory.getCurrentItem().isItemEnchanted())
 			{
 				if(Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
 				{
@@ -199,7 +185,7 @@ public class LiteModExample implements Tickable, PreRenderListener, Configurable
 			// 通知スタート
 			if (isNotify)
 			{
-				dNotify.startNotify(minecraft, partialTicks);
+				dNotify.startNotify(mc, partialTicks);
 			}
 		}
 	}

@@ -176,11 +176,7 @@ public class DurabilityNotify
 		||  currentItem.isItemEnchanted()) // 2: アイテムにエンチャントが付いているか
 		{
 			float pitch = ( 0.85F + notifyKey * 0.15F );
-			mc.getSoundHandler().playSound(SetSound.setNotifySound(
-					pitch,
-					mc.player.posX,
-					mc.player.posY,
-					mc.player.posZ));
+			mc.getSoundHandler().playSound(SetSound.setNotifySound(pitch));
 		}
 	}
 

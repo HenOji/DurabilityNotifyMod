@@ -1,11 +1,12 @@
 package com.henoji;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 
 /**
- * 音を鳴らすクラス.
+ * 音をプレイヤーの位置に鳴らすクラス.
  * ピッチの変更が可能.
  *
  * @author HenOji
@@ -28,9 +29,12 @@ public class SetSound extends PositionedSound
 		this.attenuationType = AttenuationType.NONE;
 
 	}
-	/* カスタムサウンド再生 */
-	public static SetSound setNotifySound (float pitchIn, double xIn, double yIn, double zIn)
+	/* カスタムサウンドをプレイヤーの位置で再生 */
+	public static SetSound setNotifySound (float pitchIn)
 	{
-		return new SetSound(NOTIFY_SOUND_PATH, pitchIn, (float)xIn, (float)yIn, (float)zIn);
+		return new SetSound(NOTIFY_SOUND_PATH, pitchIn,
+							(float)Minecraft.getMinecraft().player.posX,
+							(float)Minecraft.getMinecraft().player.posY,
+							(float)Minecraft.getMinecraft().player.posZ);
 	}
 }

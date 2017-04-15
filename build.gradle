@@ -24,7 +24,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.liteloader'
 apply plugin: 'org.spongepowered.mixin'
 
-version = "0.1"
+version = "1.0"
 group = "com.henoji.durabilitynotifymod" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "durabilitynotifymod"
 
@@ -48,11 +48,11 @@ mixin {
 litemod {
     json {
         name = "DurabilityNotify"
-        version = project.version 
+        version = project.version
         mcversion = "1.11.r2"
         mixinConfigs += "mixins.example.json"
-        author = "HenOji" 
-        description = "Short Cut Key\nON/OFF 'I'Key\nShow enchant 'G'Key\nChange position of enchant 'Ctrl + G'Key" 
+        author = "HenOji"
+        description = "Short Cut Key\nON/OFF 'I'Key\nShow enchant 'G'Key\nChange position of enchant 'Ctrl + G'Key"
     }
 }
 

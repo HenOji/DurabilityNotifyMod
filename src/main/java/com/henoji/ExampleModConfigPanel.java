@@ -52,7 +52,7 @@ public class ExampleModConfigPanel extends AbstractConfigPanel
         y += 16;
 
         /* Mod ON/OFF */
-        this.addControl(new GuiCheckbox(0, 16, y, I18n.format("notifymod.config.option.notify.enabled") +" ('"+ mod.getDurabilityNotifyKeyName() +"' Key)"),
+        this.addControl(new GuiCheckbox(0, 8, y, I18n.format("notifymod.config.option.notify.enabled") +" ('"+ mod.getDurabilityNotifyKeyName() +"' Key)"),
         		new ConfigOptionListener<GuiCheckbox>()
         		{
         			@Override
@@ -71,7 +71,7 @@ public class ExampleModConfigPanel extends AbstractConfigPanel
         y += 16;
 
         /* Main Hand */
-        this.addControl(new GuiCheckbox(1, 16, y, I18n.format("notifymod.config.option.mainhand")),
+        this.addControl(new GuiCheckbox(1, 8, y, I18n.format("notifymod.config.option.mainhand")),
         		new ConfigOptionListener<GuiCheckbox>()
         		{
             		@Override
@@ -97,7 +97,7 @@ public class ExampleModConfigPanel extends AbstractConfigPanel
         y += 16;
 
         /* エンチャントアイテムのみ通知音鳴らすチェックボックス */
-        this.addControl(new GuiCheckbox(3, 16, y, I18n.format("notifymod.config.option.notify.onlyEnchant.enabled")),
+        this.addControl(new GuiCheckbox(3, 8, y, I18n.format("notifymod.config.option.notify.onlyEnchant.enabled")),
         		new ConfigOptionListener<GuiCheckbox>()
         		{
             		@Override
@@ -116,7 +116,7 @@ public class ExampleModConfigPanel extends AbstractConfigPanel
         y += 16;
 
         /* Main Hand */
-        this.addControl(new GuiCheckbox(4, 16, y, I18n.format("notifymod.config.option.mainhand")),
+        this.addControl(new GuiCheckbox(4, 8, y, I18n.format("notifymod.config.option.mainhand")),
         		new ConfigOptionListener<GuiCheckbox>()
         		{
             		@Override
@@ -147,7 +147,7 @@ public class ExampleModConfigPanel extends AbstractConfigPanel
         y += 16;
 
         /* アイテムが変わったらエンチャントを表示するチェックボックス */
-        this.addControl(new GuiCheckbox(6, 16, y, I18n.format("notifymod.config.option.displayEnchant.enabled") +" ('"+ mod.getDisplayEnchantKeyName() +"' Key)"),
+        this.addControl(new GuiCheckbox(6, 8, y, I18n.format("notifymod.config.option.displayEnchant.enabled") +" ('"+ mod.getDisplayEnchantKeyName() +"' Key)"),
         		new ConfigOptionListener<GuiCheckbox>()
         		{
             		@Override
@@ -161,7 +161,7 @@ public class ExampleModConfigPanel extends AbstractConfigPanel
         y += 16;
 
         /* 表示位置 */
-        this.addLabel(6, 32, y, 200, 16, 0xe0e0e0, I18n.format("notifymod.config.help.6") +" ('Ctrl+"+ mod.getDisplayEnchantKeyName() +"' Key)");
+        this.addLabel(6, 24, y, 200, 16, 0xe0e0e0, I18n.format("notifymod.config.help.6") +" ('Ctrl+"+ mod.getDisplayEnchantKeyName() +"' Key)");
 
         y += 14;
 
@@ -179,7 +179,7 @@ public class ExampleModConfigPanel extends AbstractConfigPanel
 			@Override
 			public void setEntryValue(int id, boolean value) {}
 
-		}, 4, 32, y, "", 0, 8.9F, mod.getDisplayEnchantPreset(),
+		}, 4, 24, y, "", 0, 8.9F, mod.getDisplayEnchantPreset(),
 
     		new GuiSlider.FormatHelper()
     		{
@@ -198,7 +198,7 @@ public class ExampleModConfigPanel extends AbstractConfigPanel
         y += 24;
 
         /* 表示時間 */
-        this.addLabel(7, 32, y, 200, 16, 0xe0e0e0, I18n.format("notifymod.config.help.7"));
+        this.addLabel(7, 24, y, 200, 16, 0xe0e0e0, I18n.format("notifymod.config.help.7"));
 
         y += 14;
 
@@ -218,7 +218,7 @@ public class ExampleModConfigPanel extends AbstractConfigPanel
 			@Override
 			public void setEntryValue(int id, boolean value) {}
 
-		}, 6, 32, y, "", 1.0F, 10.0F, mod.getEnchantDisplaySecs(),
+		}, 6, 24, y, "", 1.0F, 10.0F, mod.getEnchantDisplaySecs(),
 
     		new GuiSlider.FormatHelper()
     		{
@@ -237,7 +237,7 @@ public class ExampleModConfigPanel extends AbstractConfigPanel
         y += 6;
 
         /* エンチャント名表示時間をリセット(2.0秒に)する */
-        this.addControl(new GuiHoverLabel(7, 184, y, mc.fontRendererObj, I18n.format("notifymod.config.option.reset")),
+        this.addControl(new GuiHoverLabel(7, 176, y, mc.fontRendererObj, I18n.format("notifymod.config.option.reset")),
         		new ConfigOptionListener<GuiHoverLabel>()
         		{
             		@Override
