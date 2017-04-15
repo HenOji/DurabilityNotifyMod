@@ -1,6 +1,6 @@
 
-key.durabilityNotify.toggle=Toggle Durability Notify
-key.displayEnchant=Display enchant key
+key.durabilityNotify.toggle=Toggle Durability Notify Mod
+key.displayEnchant=Display Enchant Key
 
 notifymod.config.title=Durability Notify Mod Configuration
 notifymod.config.help.1=*Notify is not enabled in creative mode and spectator mode.

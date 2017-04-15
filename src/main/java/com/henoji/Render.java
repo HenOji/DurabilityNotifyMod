@@ -24,8 +24,8 @@ import net.minecraft.util.EnumHandSide;
 
 public class Render{
 
-	private Minecraft mc;
-	private FontRenderer fontRenderer;
+	private Minecraft mc = Minecraft.getMinecraft();
+	private FontRenderer fontRenderer = mc.fontRendererObj;
 
 	private final int BOTTOM_LEFT  = 0,
 					  HOTBAR_LEFT  = 1,
@@ -47,11 +47,7 @@ public class Render{
 	private List<String> enchantList = new ArrayList<String>();
 
 	/* Constractor */
-	public Render(Minecraft mc)
-	{
-		this.mc = mc;
-		this.fontRenderer = this.mc.fontRendererObj;
-	}
+	public Render(){}
 
 	/* マイクラ解像度取得 */
 	private void setScaledResolution()

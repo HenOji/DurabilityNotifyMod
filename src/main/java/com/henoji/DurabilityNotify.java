@@ -12,8 +12,8 @@ import net.minecraft.item.ItemStack;
 
 public class DurabilityNotify
 {
-	private Minecraft mc;
-	private Render    render;
+	private Minecraft mc = Minecraft.getMinecraft();
+	private Render    render = new Render();
 
 	private boolean isNotifySoundOnlyEnchant,
 					isDisplayEnchant,
@@ -36,10 +36,7 @@ public class DurabilityNotify
 	private int[]       notifyKeyArray  = {0, 0};
 
 	/* Constructor */
-	public DurabilityNotify(Minecraft mc)
-	{
-		this.render = new Render(mc);
-	}
+	public DurabilityNotify(){}
 
 	/* 設定の通知音を鳴らすか */
 	public boolean isNotifySoundHand(int Key)
@@ -109,10 +106,8 @@ public class DurabilityNotify
 	}
 
 	/* ここから始まる */
-	public void startNotify(Minecraft mc, float partialTicks)
+	public void startNotify(float partialTicks)
 	{
-		this.mc = mc;
-
 		ItemStack mainhandItem = mc.player.inventory.getCurrentItem();
 		int currentHotbar      = mc.player.inventory.currentItem;
 		ItemStack offhandItem  = mc.player.inventory.offHandInventory.get(0);

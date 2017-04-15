@@ -16,6 +16,7 @@ import com.mumfrey.liteloader.modconfig.ExposableOptions;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 
 /**
@@ -31,7 +32,7 @@ public class LiteModExample implements Tickable, PreRenderListener, Configurable
 	 * This is our instance of Clock which we will draw every tick
 	 */
 //	private Clock clock = new Clock(10, 10);
-	private DurabilityNotify dNotify = new DurabilityNotify(Minecraft.getMinecraft());
+	private DurabilityNotify dNotify = new DurabilityNotify();
 
 	/**
 	 * This is a keybinding that we will register with the game and use to toggle the clock
@@ -185,23 +186,12 @@ public class LiteModExample implements Tickable, PreRenderListener, Configurable
 			// 通知スタート
 			if (isNotify)
 			{
-				dNotify.startNotify(mc, partialTicks);
+				dNotify.startNotify(partialTicks);
 			}
 		}
 	}
 
-/*	boolean getClockVisibility()
-
-	{
-	    return this.clock.isVisible();
-	}
-
-	void setClockVisibility(boolean visible)
-	{
-		this.clock.setVisible(this.clockVisible = visible);
-	}*/
-
-	/* 通知機能 ON/OFF */
+	/* Mod ON/OFF */
 	boolean isDurabilityNotify()
 	{
 		return this.isNotify;
@@ -240,6 +230,11 @@ public class LiteModExample implements Tickable, PreRenderListener, Configurable
 		return this.dNotify.isNotifySoundOnlyEnchant();
 	}
 
+	void setNotifySoundOnlyEnchant(boolean toggle)
+	{
+		this.dNotify.setNotifySoundOnlyEnchant(this.isNotifySoundOnlyEnchant = toggle);
+	}
+
 	/* 耐久値表示 メインハンド ON/OFF */
 	boolean isDisplayDurabilityMainhand()
 	{
@@ -262,24 +257,19 @@ public class LiteModExample implements Tickable, PreRenderListener, Configurable
 		this.dNotify.setDisplayDurabilityHand(this.isDisplayDurabilityOffhand = toggle, 1);
 	}
 
-	void setNotifySoundOnlyEnchant(boolean toggle)
-	{
-		this.dNotify.setNotifySoundOnlyEnchant(this.isNotifySoundOnlyEnchant = toggle);
-	}
-
-	/* 通知機能 ON/OFF キー名 getter */
+	/* 通知機能 ON/OFF getキー名 */
 	String getDurabilityNotifyKeyName()
 	{
-		return Keyboard.getKeyName(durabilityNotifyKey.getKeyCode());
+		return GameSettings.getKeyDisplayString(durabilityNotifyKey.getKeyCode());
 	}
 
-	/* エンチャント名表示キー"名" getter */
+	/* エンチャント表示 getキー名 */
 	String getDisplayEnchantKeyName()
 	{
-		return Keyboard.getKeyName(displayEnchantKey.getKeyCode());
+		return GameSettings.getKeyDisplayString(displayEnchantKey.getKeyCode());
 	}
 
-	/* エンチャント表示getter */
+	/* アイテム変更時エンチャント表示 ON/OFF */
 	boolean isDisplayEnchant()
 	{
 		return this.dNotify.isDisplayEnchant();

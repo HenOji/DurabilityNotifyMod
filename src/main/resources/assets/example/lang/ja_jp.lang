@@ -1,6 +1,6 @@
 
-key.durabilityNotify.toggle=耐久通知の ON/OFF
-key.displayEnchant=エンチャント名を表示
+key.durabilityNotify.toggle=ModのON/OFF
+key.displayEnchant=エンチャントを表示
 
 notifymod.config.title=Durability Notify Modの設定
 notifymod.config.help.1=注意! クリエイティブモードとスペクテイターモードでは無効になっています。
