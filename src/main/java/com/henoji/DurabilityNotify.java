@@ -17,11 +17,11 @@ public class DurabilityNotify
 
 	private boolean isNotifySoundOnlyEnchant,
 					isDisplayEnchant,
-					isItemChanged,
 					isPresetChanged;
 
 	private boolean[] isNotifySoundArray = {false,false},
-					  isDisplayDurabilityArray = {false,false};
+					  isDisplayDurabilityArray = {false,false},
+					  isItemChanged = {false,false};
 
 	private float enchantDisplaySecs,
 				  displayTicks,
@@ -105,59 +105,65 @@ public class DurabilityNotify
 		this.displayTicks = this.enchantDisplaySecs * 20.0F;
 	}
 
-	/* ここから始まる */
+	/* ここから始まる my Revolution */
 	public void startNotify(float partialTicks)
 	{
 		ItemStack mainhandItem = mc.player.inventory.getCurrentItem();
 		int currentHotbar      = mc.player.inventory.currentItem;
 		ItemStack offhandItem  = mc.player.inventory.offHandInventory.get(0);
 
-		/* 耐久通知検索 */
-		searchNotify(mainhandItem, currentHotbar, 0);
-		searchNotify(offhandItem, -1, 1);
+		/* 耐久通知検索 と 耐久値表示*/
+		searchAndDisplay(mainhandItem, currentHotbar, 0);
+		searchAndDisplay(offhandItem, -1, 1);
 
-		// エンチャント表示
-		if(isItemChanged && isDisplayEnchant && mainhandItem.isItemEnchanted()) setDisplayTicks();
-		if(!mainhandItem.isItemEnchanted()) displayTicks = 0;
-		if((int)displayTicks > 0)
+		if(isItemChanged[0])
 		{
-			displayEnchant(partialTicks, mainhandItem);
+			if(isDisplayEnchant && mainhandItem.isItemEnchanted()) setDisplayTicks();
+			else if(!mainhandItem.isItemEnchanted())
+			{
+				displayTicks     = 0;
+				isItemChanged[0] = false;
+			}
 		}
+		// エンチャント表示
+		if((int)displayTicks > 0) displayEnchant(partialTicks, mainhandItem);
+	}
+
+	/* アイテムの耐久通知検索と耐久値表示 */
+	private void searchAndDisplay(ItemStack handItem, int currentHotbar, int handKey)
+	{
+		boolean isTool = handItem.isItemStackDamageable();
+		int itemDurability = handItem.getMaxDamage() - handItem.getItemDamage();
+		if(isNotifySoundArray[handKey]) searchNotify(handItem, currentHotbar, handKey, itemDurability);
+		if(isDisplayDurabilityArray[handKey] && isTool) displayDurability(handKey, itemDurability);
 	}
 
 	/* 耐久通知検索メソッド */
-	private void searchNotify(ItemStack handItem, int currentHotbar, int handKey)
+	private void searchNotify(ItemStack handItem, int currentHotbar, int handKey, int itemDurability)
 	{
-		/* 1 AND (2 OR 3) AND 4 */
-		if(handItem.isItemStackDamageable()) // 1: ツールか
+		boolean isTool = handItem.isItemStackDamageable();
+		/* (1 OR 2) AND 3 */
+		if(prevHotbarArray[handKey] != currentHotbar               // 1: 前Tickとホットバーが違うか
+		|| prevItemArray[handKey].getItem() != handItem.getItem()) // 2: 前Tickとアイテムが違うか
 		{
-			int itemDurability = handItem.getMaxDamage() - handItem.getItemDamage();
-
-			if(prevHotbarArray[handKey] != currentHotbar               // 2: 前Tickとホットバーが違うか
-			|| prevItemArray[handKey].getItem() != handItem.getItem()) // 3: 前Tickとアイテムが違うか
+			isItemChanged[handKey] = true; // アイテムが変わった
+			notifyKeyArray[handKey] = 0;
+			if(isTool && itemDurability <= NOTIFY_ARRAY[0])  // 3: 通知耐久最大値以下か
 			{
-				notifyKeyArray[handKey] = 0;
-				if(handKey == 0) isItemChanged = true; // アイテムが変わった
-				if(itemDurability <= NOTIFY_ARRAY[0]) // 4: 通知耐久最大値以下か
+				for (notifyKeyArray[handKey] = 1; notifyKeyArray[handKey] < NOTIFY_ARRAY.length; notifyKeyArray[handKey]++)
 				{
-					for (notifyKeyArray[handKey] = 1; notifyKeyArray[handKey] < NOTIFY_ARRAY.length; notifyKeyArray[handKey]++)
-					{
-						// アイテムの耐久値が通知する値より大きい
-						if(itemDurability > NOTIFY_ARRAY[notifyKeyArray[handKey]]) break;
-					}
-					if(isNotifySoundArray[handKey]) notifySound(handItem, notifyKeyArray[handKey]); // 通知音
+					// アイテムの耐久値が通知する値より大きい
+					if(itemDurability > NOTIFY_ARRAY[notifyKeyArray[handKey]]) break;
 				}
+				if(isNotifySoundArray[handKey]) notifySound(handItem, notifyKeyArray[handKey]); // 通知音
 			}
-			else // ホットバーとアイテムが前Tickと同じ
-			{
-				if(itemDurability <= NOTIFY_ARRAY[notifyKeyArray[handKey]]) // 耐久値が通知耐久値以下
-				{
-					notifyKeyArray[handKey]++;
-					if(isNotifySoundArray[handKey]) notifySound(handItem, notifyKeyArray[handKey]); // 通知音
-				}
-			}
-			/* 耐久値表示 */
-			if(isDisplayDurabilityArray[handKey]) displayDurability(handKey, itemDurability);
+		}
+		/* (1 NOR 2) AND 4 */
+		/* 4: アイテム耐久値が通知耐久値以下か */
+		else if(isTool && itemDurability <= NOTIFY_ARRAY[notifyKeyArray[handKey]])
+		{
+			notifyKeyArray[handKey]++;
+			if(isNotifySoundArray[handKey]) notifySound(handItem, notifyKeyArray[handKey]); // 通知音
 		}
 		/* 配列に代入 */
 		prevItemArray[handKey]   = handItem;
@@ -179,7 +185,7 @@ public class DurabilityNotify
 	private void displayDurability(int handKey, int itemDurability)
 	{
 		int fontColor;
-		if(notifyKeyArray[handKey] > 2) // 耐久値 色
+		if(notifyKeyArray[handKey] > 2)
 		{
 			fontColor = 0xffff4040; // 赤色
 		}
@@ -197,10 +203,10 @@ public class DurabilityNotify
 	/* エンチャント表示メソッド */
 	private void displayEnchant(float partialTicks, ItemStack currentItem)
 	{
-		if(isItemChanged || isPresetChanged)
+		if(isItemChanged[0] || isPresetChanged)
 		{
-			render.setDisplayEnchant(currentItem, displayEnchantPreset, isItemChanged);
-			isItemChanged = false;
+			render.setDisplayEnchant(currentItem, displayEnchantPreset, isItemChanged[0]);
+			isItemChanged[0] = false;
 			if(!(displayEnchantPreset == 1 || displayEnchantPreset == 2)) isPresetChanged = false;
 		}
 

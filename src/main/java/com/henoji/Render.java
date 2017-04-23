@@ -81,14 +81,14 @@ public class Render{
 		}
 
 		glPushMatrix();
-		glEnableBlend();
+		glDisableBlend();
 		glBlendFuncSeparate(770, 771, 1, 0);
 		fontRenderer.drawString(text, posX +1, posY, 0);
 		fontRenderer.drawString(text, posX -1, posY, 0);
 		fontRenderer.drawString(text, posX, posY +1, 0);
 		fontRenderer.drawString(text, posX, posY -1, 0);
-		fontRenderer.drawString(text, posX, posY, color); // 耐久値
-		glDisableBlend();
+		fontRenderer.drawString(text, posX, posY, color);
+		glEnableBlend();
 		glPopMatrix();
 	}
 
