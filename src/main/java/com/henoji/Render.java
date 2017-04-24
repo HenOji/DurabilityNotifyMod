@@ -81,37 +81,36 @@ public class Render{
 		}
 
 		glPushMatrix();
-		glDisableBlend();
+		glEnableBlend();
 		glBlendFuncSeparate(770, 771, 1, 0);
 		fontRenderer.drawString(text, posX +1, posY, 0);
 		fontRenderer.drawString(text, posX -1, posY, 0);
 		fontRenderer.drawString(text, posX, posY +1, 0);
 		fontRenderer.drawString(text, posX, posY -1, 0);
 		fontRenderer.drawString(text, posX, posY, color);
-		glEnableBlend();
+		glDisableBlend();
 		glPopMatrix();
 	}
 
-	/* エンチャントリスト・表示位置 X, Yセット */
-	public void setDisplayEnchant(ItemStack currentItem, int displayEnchantPreset, boolean isChanged)
+	/* エンチャントリスト初期化・セット */
+	public void setEnchantList(ItemStack currentItem)
 	{
-		if(isChanged)
+		int i = 0;
+		this.enchantList.clear();
+		this.fontW = 0;
+
+		for(Map.Entry<Enchantment, Integer> entry : EnchantmentHelper.getEnchantments(currentItem).entrySet())
 		{
-			/* エンチャントリスト初期化・セット */
-			int i = 0;
-			this.enchantList.clear();
-			this.fontW = 0;
-
-			for(Map.Entry<Enchantment, Integer> entry : EnchantmentHelper.getEnchantments(currentItem).entrySet())
-			{
-				this.enchantList.add(entry.getKey().getTranslatedName(entry.getValue()));
-				this.fontW = Integer.max(fontW, fontRenderer.getStringWidth(enchantList.get(i)));
-				i++;
-			}
-			this.fontH = fontRenderer.FONT_HEIGHT *i;
+			this.enchantList.add(entry.getKey().getTranslatedName(entry.getValue()));
+			this.fontW = Integer.max(fontW, fontRenderer.getStringWidth(enchantList.get(i)));
+			i++;
 		}
+		this.fontH = fontRenderer.FONT_HEIGHT *i;
+	}
 
-		/* 表示位置 X, Yセット */
+	/* 表示位置 X, Yセット */
+	public void setDisplayPosition(int displayEnchantPreset)
+	{
 		setScaledResolution();
 		switch (displayEnchantPreset)
 		{

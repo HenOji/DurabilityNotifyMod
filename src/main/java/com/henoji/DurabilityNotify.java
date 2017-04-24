@@ -113,8 +113,8 @@ public class DurabilityNotify
 		ItemStack offhandItem  = mc.player.inventory.offHandInventory.get(0);
 
 		/* 耐久通知検索 と 耐久値表示*/
-		searchAndDisplay(mainhandItem, currentHotbar, 0);
-		searchAndDisplay(offhandItem, -1, 1);
+		searchNotify(mainhandItem, currentHotbar, 0);
+		searchNotify(offhandItem, -1, 1);
 
 		if(isItemChanged[0])
 		{
@@ -129,19 +129,12 @@ public class DurabilityNotify
 		if((int)displayTicks > 0) displayEnchant(partialTicks, mainhandItem);
 	}
 
-	/* アイテムの耐久通知検索と耐久値表示 */
-	private void searchAndDisplay(ItemStack handItem, int currentHotbar, int handKey)
+	/* 耐久通知検索メソッド */
+	private void searchNotify(ItemStack handItem, int currentHotbar, int handKey)
 	{
 		boolean isTool = handItem.isItemStackDamageable();
 		int itemDurability = handItem.getMaxDamage() - handItem.getItemDamage();
-		if(isNotifySoundArray[handKey]) searchNotify(handItem, currentHotbar, handKey, itemDurability);
-		if(isDisplayDurabilityArray[handKey] && isTool) displayDurability(handKey, itemDurability);
-	}
 
-	/* 耐久通知検索メソッド */
-	private void searchNotify(ItemStack handItem, int currentHotbar, int handKey, int itemDurability)
-	{
-		boolean isTool = handItem.isItemStackDamageable();
 		/* (1 OR 2) AND 3 */
 		if(prevHotbarArray[handKey] != currentHotbar               // 1: 前Tickとホットバーが違うか
 		|| prevItemArray[handKey].getItem() != handItem.getItem()) // 2: 前Tickとアイテムが違うか
@@ -168,6 +161,9 @@ public class DurabilityNotify
 		/* 配列に代入 */
 		prevItemArray[handKey]   = handItem;
 		prevHotbarArray[handKey] = currentHotbar;
+
+		/* 耐久値表示 */
+		if(isTool && isDisplayDurabilityArray[handKey]) displayDurability(handKey, itemDurability);
 	}
 
 	/* 通知音メソッド */
@@ -181,7 +177,7 @@ public class DurabilityNotify
 		}
 	}
 
-	/* 耐久表示メソッド */
+	/* 耐久値表示メソッド */
 	private void displayDurability(int handKey, int itemDurability)
 	{
 		int fontColor;
@@ -203,13 +199,20 @@ public class DurabilityNotify
 	/* エンチャント表示メソッド */
 	private void displayEnchant(float partialTicks, ItemStack currentItem)
 	{
-		if(isItemChanged[0] || isPresetChanged)
+		/* アイテムが変わっていたらエンチャントリストを更新 */
+		if(isItemChanged[0])
 		{
-			render.setDisplayEnchant(currentItem, displayEnchantPreset, isItemChanged[0]);
+			render.setEnchantList(currentItem);
+			render.setDisplayPosition(displayEnchantPreset);
 			isItemChanged[0] = false;
+		}
+		/* エンチャント表示位置が変わっていたら表示位置更新 */
+		else if(isPresetChanged)
+		{
+			render.setDisplayPosition(displayEnchantPreset);
 			if(!(displayEnchantPreset == 1 || displayEnchantPreset == 2)) isPresetChanged = false;
 		}
-
+		/* フェードアウト処理 */
 		int alpha = (int)(this.displayTicks * 256.0F / 10.0F);
 		if(partialTicks > this.partialTicks)
 		{
